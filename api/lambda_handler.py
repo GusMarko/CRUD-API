@@ -8,13 +8,12 @@ import logging
 from decimal import Decimal
 
 dynamodbTableName = os.environ.get
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.info(event)
 
 
 def lambda_handler(event, context):
-
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    logger.info(event)
 
     httpMethod = event["httpMethod"]
     path = event["path"]
