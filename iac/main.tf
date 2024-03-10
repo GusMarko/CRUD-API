@@ -34,7 +34,7 @@ resource "aws_lambda_function" "main" {
 
 resource "aws_security_group" "main" {
 
-  name        = "comments-lambda-${var.env}"
+  name        = "commentsapi-lambda-${var.env}"
   description = "Security groupd for comments lambda"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
 
