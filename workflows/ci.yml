@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
+      # TO-DO: write unit tests and execute them before building docker image
       - name: Configure pipeline values
         id: pipeline_config
         run: |
