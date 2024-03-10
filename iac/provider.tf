@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     encrypt    = true
     bucket     = "mg-terraform-state-storage"
-    key        = "environment-iac/terraform.tfstate"
+    key        = "crud-api/terraform.tfstate"
     region     = "aws_region_placeholder"
     access_key = "access_key_placeholder"
     secret_key = "secret_key_placeholder"
