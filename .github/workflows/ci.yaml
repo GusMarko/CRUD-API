@@ -49,8 +49,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t ${{env.IMAGE_NAME}} ./api/
-          docker tag ${{env.IMAGE_NAME}} ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${{env.IMAGE_NAME}}
+          docker tag ${{env.IMAGE_NAME}} ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${{env.IMAGE_NAME}}
+          docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}
