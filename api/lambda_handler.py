@@ -7,29 +7,31 @@ import datetime
 import logging
 from decimal import Decimal
 
-dynamodbTableName = os.environ.get
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-logger.info(event)
 
 
 def lambda_handler(event, context):
+    logger.info(event)
 
     httpMethod = event["httpMethod"]
     path = event["path"]
     table_name = os.environ["dbtablename"]
+    dynamodb = boto3.resource("dynamodb")
+    table = dynamodb.Table(table_name)
 
     if httpMethod == "GET" and path == "/health":
         response = buildResponse(200)
     elif httpMethod == "GET" and path == "/comment":
-        response = getComment(event["queryStringParameters"]["commentId"], table_name)
+        response = getComment(event["queryStringParameters"]["commentId"], table)
     elif httpMethod == "GET" and path == "/comments":
-        response = getComments(table_name)
+        response = getComments(table)
     elif httpMethod == "POST" and path == "/comment":
-        response = saveComment(json.loads(event["body"]), table_name)
+        response = saveComment(json.loads(event["body"]), table)
     elif httpMethod == "DELETE" and path == "/comment":
         requestBody = json.loads(event["body"])
-        response = deleteComment(requestBody["commentId"], table_name)
+        response = deleteComment(requestBody["commentId"], table)
     else:
         response = buildResponse(404, "Not Found")
     return response
