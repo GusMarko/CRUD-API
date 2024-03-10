@@ -4,6 +4,7 @@ from xml.dom import minidom
 import urllib3
 import os
 import datetime
+import logging
 from decimal import Decimal
 
 dynamodbTableName = os.environ.get
