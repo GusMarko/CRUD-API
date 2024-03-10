@@ -45,8 +45,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{env.IMAGE_NAME}}:${{ env.GITHUB_RUN_ID }} ./api/
-          docker tag ${{env.IMAGE_NAME}}:${{ env.GITHUB_RUN_ID }} ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}
+          docker build -t ${{env.IMAGE_NAME}}:$GITHUB_RUN_ID ./api/
+          docker tag ${{env.IMAGE_NAME}}:$GITHUB_RUN_ID ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}
 
       - name: Push Docker image to ECR
         run: |
