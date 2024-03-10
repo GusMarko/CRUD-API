@@ -25,12 +25,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Configure pipeline values
+      - name: Configure terraform and pipeline values
         id: pipeline_config
         run: |
-          cd devops_helper_scripts
-          pip install boto3
-          python3 configure_pipeline_values.py
+            cd devops_helper_scripts
+            pip install boto3
+            python3 configure_terraform_values.py         
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -52,11 +52,7 @@ jobs:
         run: |
           docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}
 
-      - name: Configure terraform values
-        run: |
-          cd devops_helper_scripts
-          pip install boto3
-          python3 configure_terraform_values.py
+
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2

@@ -9,6 +9,8 @@ def main():
     env_name = get_environment()
     boto3_session = init_boto3_session()
     replace_tfvars(env_name, boto3_session)
+    ecr_repo_name = f"comments/{env_name}/code-images"
+    print(f"::set-output name=ecr_repo_name::{ecr_repo_name}")
 
 
 def replace_tfvars(env, boto3_session):
