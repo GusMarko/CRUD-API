@@ -136,7 +136,7 @@ resource "aws_api_gateway_method" "comments_method_health" {
   authorization = "NONE"
 }
 
-resource "aws_api_gateway_integration" "comments_integration" {
+resource "aws_api_gateway_integration" "comments_integration_health" {
   rest_api_id             = aws_api_gateway_rest_api.comments_api.id
   resource_id             = aws_api_gateway_resource.comments_resource_health.id
   http_method             = aws_api_gateway_method.comments_method_health.http_method
@@ -227,18 +227,13 @@ resource "aws_api_gateway_integration" "comments_integration_comments" {
 
 resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.comments_api.id
-
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.comments_resource_health.id,
-      aws_api_gateway_resource.comments_resource_comment.id,
-      aws_api_gateway_resource.comments_resource_comments.id,
-    ]))
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  depends_on = [
+    aws_api_gateway_integration.comments_integration_health,
+    aws_api_gateway_integration.comments_integration_comment,
+    aws_api_gateway_integration.comments_integration_comment2,
+    aws_api_gateway_integration.comments_integration_comment3,
+    aws_api_gateway_integration.comments_integration_comments
+  ]
 }
 
 resource "aws_api_gateway_stage" "main" {
