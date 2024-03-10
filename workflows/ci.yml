@@ -1,0 +1,46 @@
+name: "Build Code Image"
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  IMAGE_NAME: "comments-api"
+
+jobs:
+  BuildAndPush:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Configure pipeline values
+        id: pipeline_config
+        run: |
+          cd devops_helper_scripts
+          pip install boto3
+          python3 configure_pipeline_values.py
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image
+        run: docker build -t ${IMAGE_NAME} ../api/
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ pipeline_config.ecr_repo_name }}/${IMAGE_NAME}
