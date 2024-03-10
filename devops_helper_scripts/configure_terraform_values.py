@@ -12,19 +12,22 @@ def main():
 
 
 def replace_tfvars(env, boto3_session):
+
     aws_region = os.environ.get("AWS_REGION")
     tf_role_credentials = get_aws_secret("/pipeline-user/credentials", boto3_session)
     access_key = tf_role_credentials["access_key"]
     secret_key = tf_role_credentials["secret_key"]
     tfvars_path = "../iac/terraform.tfvars"
     backend_config_path = "../iac/provider.tf"
-    image
+    image = f"{os.environ.get('AWS_ACCOUNT_ID')}.dkr.ecr.{aws_region}.amazonaws.com/comments/{env_name}/code-images:latest"
+
     with open(tfvars_path, "r") as f:
         tfvars = f.read()
     tfvars = tfvars.replace("aws_region_placeholder", aws_region)
     tfvars = tfvars.replace("access_key_placeholder", access_key)
     tfvars = tfvars.replace("secret_key_placeholder", secret_key)
     tfvars = tfvars.replace("env_placeholder", env)
+    tfvars = tfvars.replace("image_uri_placeholder", image)
     with open(tfvars_path, "w") as f:
         f.write(tfvars)
 
