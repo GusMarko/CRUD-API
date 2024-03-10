@@ -35,7 +35,15 @@ jobs:
           pip install boto3
           python3 configure_pipeline_values.py
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{env.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Login to Amazon ECR
+        id: login_ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build Docker image
@@ -43,4 +51,4 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/${{ steps.pipeline_config.ecr_repo_name }}/${IMAGE_NAME}
+          docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${IMAGE_NAME}
