@@ -47,8 +47,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build Docker image
-        run: docker build -t ${IMAGE_NAME} ./api/
+        run: |
+          docker build -t ${{env.IMAGE_NAME}} ./api/
+          docker tag ${{env.IMAGE_NAME}}:latest ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${{env.IMAGE_NAME}}:latest
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${IMAGE_NAME} ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${IMAGE_NAME}
+          docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${{env.IMAGE_NAME}}:latest
