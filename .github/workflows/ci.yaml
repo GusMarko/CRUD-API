@@ -51,4 +51,4 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${IMAGE_NAME}
+          docker push ${IMAGE_NAME} ${{ steps.login_ecr.outputs.registry }}/${{ steps.pipeline_config.outputs.ecr_repo_name }}/${IMAGE_NAME}
