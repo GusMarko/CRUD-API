@@ -118,26 +118,152 @@ resource "aws_lambda_permission" "allow_api_gateway" {
 resource "aws_api_gateway_rest_api" "comments_api" {
   name        = "comments-api-${var.env}"
   description = "API for Comments Lambda function"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 }
 
-resource "aws_api_gateway_resource" "comments_resource" {
+resource "aws_api_gateway_resource" "comments_resource_health" {
   rest_api_id = aws_api_gateway_rest_api.comments_api.id
   parent_id   = aws_api_gateway_rest_api.comments_api.root_resource_id
-  path_part   = "comments-${var.env}"
+  path_part   = "health"
 }
 
-resource "aws_api_gateway_method" "comments_method" {
+resource "aws_api_gateway_method" "comments_method_health" {
   rest_api_id   = aws_api_gateway_rest_api.comments_api.id
-  resource_id   = aws_api_gateway_resource.comments_resource.id
-  http_method   = "ANY"
+  resource_id   = aws_api_gateway_resource.comments_resource_health.id
+  http_method   = "GET"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "comments_integration" {
   rest_api_id             = aws_api_gateway_rest_api.comments_api.id
-  resource_id             = aws_api_gateway_resource.comments_resource.id
-  http_method             = aws_api_gateway_method.comments_method.http_method
+  resource_id             = aws_api_gateway_resource.comments_resource_health.id
+  http_method             = aws_api_gateway_method.comments_method_health.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.main.invoke_arn
+}
+
+
+
+resource "aws_api_gateway_resource" "comments_resource_comment" {
+  rest_api_id = aws_api_gateway_rest_api.comments_api.id
+  parent_id   = aws_api_gateway_rest_api.comments_api.root_resource_id
+  path_part   = "comment"
+}
+
+resource "aws_api_gateway_method" "comments_method_comment" {
+  rest_api_id   = aws_api_gateway_rest_api.comments_api.id
+  resource_id   = aws_api_gateway_resource.comments_resource_comment.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "comments_integration_comment" {
+  rest_api_id             = aws_api_gateway_rest_api.comments_api.id
+  resource_id             = aws_api_gateway_resource.comments_resource_comment.id
+  http_method             = aws_api_gateway_method.comments_method_comment.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.main.invoke_arn
+}
+
+
+resource "aws_api_gateway_method" "comments_method_comment2" {
+  rest_api_id   = aws_api_gateway_rest_api.comments_api.id
+  resource_id   = aws_api_gateway_resource.comments_resource_comment.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "comments_integration_comment2" {
+  rest_api_id             = aws_api_gateway_rest_api.comments_api.id
+  resource_id             = aws_api_gateway_resource.comments_resource_comment.id
+  http_method             = aws_api_gateway_method.comments_method_comment2.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.main.invoke_arn
+}
+
+resource "aws_api_gateway_method" "comments_method_comment3" {
+  rest_api_id   = aws_api_gateway_rest_api.comments_api.id
+  resource_id   = aws_api_gateway_resource.comments_resource_comment.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "comments_integration_comment3" {
+  rest_api_id             = aws_api_gateway_rest_api.comments_api.id
+  resource_id             = aws_api_gateway_resource.comments_resource_comment.id
+  http_method             = aws_api_gateway_method.comments_method_comment3.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.main.invoke_arn
+}
+
+resource "aws_api_gateway_resource" "comments_resource_comments" {
+  rest_api_id = aws_api_gateway_rest_api.comments_api.id
+  parent_id   = aws_api_gateway_rest_api.comments_api.root_resource_id
+  path_part   = "comments"
+}
+
+resource "aws_api_gateway_method" "comments_method_comments" {
+  rest_api_id   = aws_api_gateway_rest_api.comments_api.id
+  resource_id   = aws_api_gateway_resource.comments_resource_comments.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "comments_integration_comments" {
+  rest_api_id             = aws_api_gateway_rest_api.comments_api.id
+  resource_id             = aws_api_gateway_resource.comments_resource_comments.id
+  http_method             = aws_api_gateway_method.comments_method_comments.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.main.invoke_arn
+}
+
+
+resource "aws_api_gateway_deployment" "main" {
+  rest_api_id = aws_api_gateway_rest_api.comments_api.id
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.comments_resource_health.id,
+      aws_api_gateway_resource.comments_resource_comment.id,
+      aws_api_gateway_resource.comments_resource_comments.id,
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "main" {
+  deployment_id = aws_api_gateway_deployment.main.id
+  rest_api_id   = aws_api_gateway_rest_api.comments_api.id
+  stage_name    = var.env
+}
+
+
+data "aws_iam_policy_document" "main" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["execute-api:Invoke"]
+    resources = [aws_api_gateway_rest_api.test.execution_arn]
+
+    condition {
+      test     = "IpAddress"
+      variable = "aws:SourceIp"
+      values   = ["123.123.123.123/32"]
+    }
+  }
 }

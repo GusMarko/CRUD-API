@@ -19,7 +19,7 @@ def replace_tfvars(env, boto3_session):
     secret_key = tf_role_credentials["secret_key"]
     tfvars_path = "../iac/terraform.tfvars"
     backend_config_path = "../iac/provider.tf"
-    image = f"{os.environ.get('AWS_ACCOUNT_ID')}.dkr.ecr.{aws_region}.amazonaws.com/comments/{env}/code-images:latest"
+    image = f"{os.environ.get('AWS_ACCOUNT_ID')}.dkr.ecr.{aws_region}.amazonaws.com/comments/{env}/code-images:{os.environ.get('GITHUB_RUN_ID')}"
 
     with open(tfvars_path, "r") as f:
         tfvars = f.read()
