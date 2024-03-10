@@ -7,7 +7,7 @@ import shutil
 
 def main():
     env_name = get_environment()
-    ecr_repo_name = f"comments-{env_name}"
+    ecr_repo_name = f"comments/{env_name}/code-images"
     print(f"::set-output name=ecr_repo_name::{ecr_repo_name}")
 
 
